@@ -138,6 +138,10 @@ class User implements Comparable<User> {
         this.passwordHash = hashPassword(password, this.salt);
     }
 
+    //*******************************
+    //*******PASSWORD SYSTEM*********
+    //*******************************
+
     // Method to verify the password
     public boolean verifyPassword(String password) {
         String attemptedHash = hashPassword(password, this.salt);
