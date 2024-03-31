@@ -4,6 +4,11 @@ import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Base64;
 
 // Represents a user profile in the FaceLife application
 class User implements Comparable<User> {
@@ -16,6 +21,9 @@ class User implements Comparable<User> {
     private boolean darkMode;
     private String massage;
     private final ArrayList<User> friends = new ArrayList<>(); // List of friends
+    private String passwordHash;
+    private byte[] salt;
+
 
     // Constructors
 
@@ -123,5 +131,37 @@ class User implements Comparable<User> {
     // Returns the massage history of the person
     public String getMassage() {
         return massage;
+    }
+    // Method to set (encrypt) the password
+    public void setPassword(String password) {
+        this.salt = generateSalt();
+        this.passwordHash = hashPassword(password, this.salt);
+    }
+
+    // Method to verify the password
+    public boolean verifyPassword(String password) {
+        String attemptedHash = hashPassword(password, this.salt);
+        return this.passwordHash.equals(attemptedHash);
+    }
+
+    // Generates a random salt
+    private byte[] generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return salt;
+    }
+
+    // Hashes the password with SHA-256 and salt
+    private String hashPassword(String password, byte[] salt) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(salt);
+            byte[] hashedPassword = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hashedPassword);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
