@@ -44,6 +44,7 @@ public class Main extends Application {
     Button btSend = new Button("send Massage");
     Button btDarkMode = new Button();
     Button btCommunity = new Button("Community");
+    Button btBackToMain = new Button("<back");
     TextField tfSend = new TextField();
     TextField tfAddFriend = new TextField();
     TextField tfName = new TextField();
@@ -78,7 +79,7 @@ public class Main extends Application {
 
     boolean defIsDarkMode = false;
     // Lists and indices
-    ArrayList<User> people = new ArrayList<>();
+    ArrayList<User> users = new ArrayList<>();
     ArrayList<Post> posts = new ArrayList<>();
     Button[] buttons = {btDeleteFriend,btAddFriend,btChangePicture,btChangeStatus,btLookup,btDelete,btAdd,btDarkMode,btClear,btSend,btCommunity};
     Label[] labels = {lFriends, lFriendsList,lName,lStatus,lUpdates,lMassages};
@@ -209,7 +210,7 @@ public class Main extends Application {
         liftBorder.setAlignment(Pos.CENTER);
         //gathering
 //      add100Persons();
-//      addFriendsToPerson(people.get(0), 50);
+//      addFriendsToPerson(users.get(0), 50);
 
         stage.getIcons().add(icon);
         stage.setScene(scene);
@@ -217,7 +218,7 @@ public class Main extends Application {
         stage.setTitle("FaceLife");
         stage.show();
         //communityPane
-
+        Button btBack = new Button("Back");
         //postBar
         TextField tfPost = new TextField("write something...");
         Button btPost = new Button("post");
@@ -229,9 +230,10 @@ public class Main extends Application {
         postBarHBox.setSpacing(5);
         postBarHBox.setPadding(new Insets(5));
         communityPane.setBottom(postBarHBox);
+        communityPane.setTop(btBackToMain);
 
         //postToggle
-        communityPane.setTop(spPosts);//make it grow (to do)
+        communityPane.setCenter(spPosts);//make it grow (to do)
 
         // Event handler for the "Add" button
         EventHandler<ActionEvent> handleAddAction = new EventHandler<ActionEvent>() {
@@ -244,9 +246,9 @@ public class Main extends Application {
                     // Check if the entered name is available
                     int existingProfileIndex = findTfIndex(tfName);
                     if (existingProfileIndex == -1) {
-                        // Create a new Person object and add it to the people list
+                        // Create a new Person object and add it to the users list
                         user = new User(tfName.getText());
-                        people.add(user);
+                        users.add(user);
 
                         // Set UI elements based on the new profile
                         userName.setText(user.getName());
@@ -259,7 +261,7 @@ public class Main extends Application {
                         // Update UI based on dark mode
                         updateUIBasedOnDarkMode(user.isDarkMode());
 
-                        System.out.println(people);
+                        System.out.println(users);
                     } else {
                         // Inform the user that the entered name is not available
                         lUpdates.setText("The name \"" + tfName.getText() + "\" is not available");
@@ -291,7 +293,7 @@ public class Main extends Application {
                     lUpdates.setText("Please select a profile to change status");
                 } else {
                     // Update the status of the current profile
-                    people.get(currentProfileIndex).setStatus(tfChangeStatus.getText());
+                    users.get(currentProfileIndex).setStatus(tfChangeStatus.getText());
                     lStatus.setText(tfChangeStatus.getText());
                     lUpdates.setText("Status Updated to: " + tfChangeStatus.getText());
                 }
@@ -331,7 +333,7 @@ public class Main extends Application {
                         ivPic.setImage(newImage);
 
                         // Update the profile's profile picture
-                        people.get(currentProfileIndex).setProfilePic(newImage);
+                        users.get(currentProfileIndex).setProfilePic(newImage);
 
                         lUpdates.setText("Picture updated");
                     } catch (Exception e) {
@@ -360,7 +362,7 @@ public class Main extends Application {
         btLookup.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // Find the index of the entered profile name in the people list
+                // Find the index of the entered profile name in the users list
                 int i = findTfIndex(tfName);
 
                 // Check if the profile with the entered name exists
@@ -368,7 +370,7 @@ public class Main extends Application {
                     lUpdates.setText("A profile with the name \"" + tfName.getText() + "\" does not exist");
                 } else {
                     // Retrieve the Person object for the found index
-                    user = people.get(i);
+                    user = users.get(i);
                     updateUIto(user);
 
                     // Update UI elements with information from the retrieved profile
@@ -383,21 +385,21 @@ public class Main extends Application {
         btDelete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // Find the index of the entered profile name in the people list
+                // Find the index of the entered profile name in the users list
                 int indexToDelete = findTfIndex(tfName);
 
                 // Check if the profile with the entered name exists
                 if (indexToDelete == -1) {
                     lUpdates.setText("No profile with the name " + tfName.getText() + " found");
                 } else {
-                    // Retrieve the profile to delete from the people list
-                    User profileToDelete = people.get(indexToDelete);
+                    // Retrieve the profile to delete from the users list
+                    User profileToDelete = users.get(indexToDelete);
 
                     // Retrieve the current profile
-                    User currentProfile = people.get(findCurrentProfileIndex());
+                    User currentProfile = users.get(findCurrentProfileIndex());
 
                     // Remove the profile to delete from all friend lists
-                    for (User user : people) {
+                    for (User user : users) {
                         user.getFriends().remove(profileToDelete);
                     }
 
@@ -416,8 +418,8 @@ public class Main extends Application {
                     // Update the friends list of the current profile
                     lFriendsList.setText(currentProfile.getFriendsList());
 
-                    // Remove the profile to delete from the people list
-                    people.remove(indexToDelete);
+                    // Remove the profile to delete from the users list
+                    users.remove(indexToDelete);
 
                     // Inform the user that the profile has been deleted
                     lUpdates.setText("Profile " + tfName.getText() + " deleted");
@@ -432,7 +434,7 @@ public class Main extends Application {
             public void handle(ActionEvent actionEvent) {
                 // Find the index of the current profile
                 currentProfileIndex = findCurrentProfileIndex();
-                // Find the index of the entered friend's profile name in the people list
+                // Find the index of the entered friend's profile name in the users list
                 int friendIndex = findTfIndex(tfAddFriend);
                 // Check if a profile is currently selected
                 if(currentProfileIndex==-1){
@@ -446,10 +448,10 @@ public class Main extends Application {
                     // Check if the user is trying to add themselves as a friend
                     lUpdates.setText("You cannot add yourself as a friend");
                 } else {
-                    // Retrieve the friend's profile from the people list
-                    User friendProfile = people.get(friendIndex);
+                    // Retrieve the friend's profile from the users list
+                    User friendProfile = users.get(friendIndex);
                     // Retrieve the current profile
-                    User currentProfile = people.get(currentProfileIndex);
+                    User currentProfile = users.get(currentProfileIndex);
                     // Check if the friend is already in the current profile's friends list
                     if (currentProfile.getFriends().contains(friendProfile)) {
                         lUpdates.setText(friendProfile.getName() + " is already a friend");
@@ -483,7 +485,7 @@ public class Main extends Application {
                 // Find the index of the current profile
                 currentProfileIndex = findCurrentProfileIndex();
 
-                // Find the index of the entered friend's profile name in the people list
+                // Find the index of the entered friend's profile name in the users list
                 int friendIndex = findTfIndex(tfAddFriend);
 
                 // Check if a profile is currently selected
@@ -494,11 +496,11 @@ public class Main extends Application {
                     String friendName = tfAddFriend.getText();
                     lUpdates.setText("A profile with the name \"" + friendName + "\" does not exist");
                 } else {
-                    // Retrieve the friend's profile from the people list
-                    User friendProfile = people.get(friendIndex);
+                    // Retrieve the friend's profile from the users list
+                    User friendProfile = users.get(friendIndex);
 
                     // Retrieve the current profile
-                    User currentProfile = people.get(currentProfileIndex);
+                    User currentProfile = users.get(currentProfileIndex);
 
                     // Check if the friend is not in the current profile's friends list
                     if (!currentProfile.getFriends().contains(friendProfile)) {
@@ -532,7 +534,7 @@ public class Main extends Application {
                     updateUIBasedOnDarkMode(!defIsDarkMode);
                 } else {
                     // If a profile is selected, toggle the dark mode for that profile
-                    User currentProfile = people.get(index);
+                    User currentProfile = users.get(index);
                     if ((!currentProfile.isDarkMode()) && (currentProfile.getProfilePic().equals(defaultPic)))
                         currentProfile.setProfilePic(darkDefaultPic);
                     else if ((currentProfile.isDarkMode()) && (currentProfile.getProfilePic().equals(darkDefaultPic))) {
@@ -562,7 +564,7 @@ public class Main extends Application {
 
                 // Clear massages and update the profile's massage
                 lMassages.setText("");
-                people.get(findCurrentProfileIndex()).setMassage("");
+                users.get(findCurrentProfileIndex()).setMassage("");
             }
         });
 
@@ -586,8 +588,8 @@ public class Main extends Application {
                     lUpdates.setText("you not send a massage to yourself");
                 }else {
                     // Get the profiles involved in sending the massage
-                    User profileToSentTo = people.get(profileToSendToIndex);
-                    User currentProfile = people.get(currentProfileIndex);
+                    User profileToSentTo = users.get(profileToSendToIndex);
+                    User currentProfile = users.get(currentProfileIndex);
                     // Check if the receiver is in the sender's friend list
                     if(currentProfile.getFriends().contains(profileToSentTo)){
                         // Update the massages and display a success message
@@ -615,9 +617,10 @@ public class Main extends Application {
         btCommunity.setOnAction(new ChangeSceneHandler(communityScene,btCommunity));
         EventHandler<ActionEvent> handlePostAction = new EventHandler<ActionEvent>() {
 
+
             @Override
             public void handle(ActionEvent actionEvent) {
-                post("user101",tfPost.getText());
+                post("F",tfPost.getText());
             }
         };
         btPost.setOnAction(handlePostAction);
@@ -629,6 +632,13 @@ public class Main extends Application {
                 }
             }
         });
+        btBackToMain.setOnAction(new ChangeSceneHandler(scene,btBackToMain));
+        class handleBackAction implements  EventHandler<ActionEvent>{
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+            }
+        }
     }
 //push
     class ChangeSceneHandler implements EventHandler<ActionEvent>{
@@ -647,12 +657,12 @@ public class Main extends Application {
 
         }
     }
-    // Method to find the index of the currently displayed profile in the people list
+    // Method to find the index of the currently displayed profile in the users list
     private int findCurrentProfileIndex() {
-        // Iterate through the people list
-        for (int i = 0; i < people.size(); i++) {
+        // Iterate through the users list
+        for (int i = 0; i < users.size(); i++) {
             // Check if the name of the currently displayed profile matches the name of the person at index i
-            if (userName.getText().equals(people.get(i).getName())) {
+            if (userName.getText().equals(users.get(i).getName())) {
                 // Return the index if a match is found
                 return i;
             }
@@ -662,10 +672,10 @@ public class Main extends Application {
     }
     // Method to find the index of a person with a name matching the text of a given TextField
     private int findTfIndex(TextField textField) {
-        // Iterate through the people list
-        for (int i = 0; i < people.size(); i++) {
+        // Iterate through the users list
+        for (int i = 0; i < users.size(); i++) {
             // Check if the text of the TextField matches the name of the person at index i
-            if (textField.getText().equals(people.get(i).getName())) {
+            if (textField.getText().equals(users.get(i).getName())) {
                 // Return the index if a match is found
                 return i;
             }
@@ -745,15 +755,15 @@ public class Main extends Application {
         }
     }
     private void addFriendsToPerson(User selectedUser, int numberOfFriendsToAdd) {
-        if (people.size() >= numberOfFriendsToAdd) {
+        if (users.size() >= numberOfFriendsToAdd) {
             for (int i = 0; i < numberOfFriendsToAdd; i++) {
-                selectedUser.getFriends().add(people.get(i));
+                selectedUser.getFriends().add(users.get(i));
             }
         }
     }
     private void add100Persons() {
         for (int i = 1; i <= 100; i++) {
-            people.add(new User(Integer.toString(i)));
+            users.add(new User(Integer.toString(i)));
         }
     }
     private void update(Scene scene){
