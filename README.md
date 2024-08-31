@@ -5,7 +5,7 @@ FaceLite is javeFX application that aim to simulate a social media enviroment
 
 ## Installation
 
-click the link:
+you can try the application via this:
 https://github.com/IcePhoenix7/FaceLite/tree/master/Download
 
 ## Buttons & Usage
